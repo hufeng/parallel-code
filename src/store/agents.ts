@@ -11,6 +11,11 @@ export async function loadAgents(): Promise<void> {
   setStore('availableAgents', agents);
 }
 
+export async function saveAgents(agents: AgentDef[]): Promise<void> {
+  await invoke(IPC.SaveAgents, { agents });
+  setStore('availableAgents', agents);
+}
+
 export async function addAgentToTask(taskId: string, agentDef: AgentDef): Promise<void> {
   const task = store.tasks[taskId];
   if (!task) return;

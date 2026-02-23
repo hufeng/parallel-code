@@ -310,6 +310,10 @@ export function toggleSettingsDialog(show?: boolean): void {
   setStore('showSettingsDialog', show ?? !store.showSettingsDialog);
 }
 
+export function toggleAgentsDialog(show?: boolean): void {
+  setStore('showAgentsDialog', show ?? !store.showAgentsDialog);
+}
+
 export function sendActivePrompt(): void {
   const taskId = store.activeTaskId;
   if (!taskId) return;

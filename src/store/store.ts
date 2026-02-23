@@ -11,7 +11,7 @@ export {
   pickAndAddProject,
   PASTEL_HUES,
 } from './projects';
-export { loadAgents, addAgentToTask, markAgentExited, restartAgent } from './agents';
+export { loadAgents, saveAgents, addAgentToTask, markAgentExited, restartAgent } from './agents';
 export {
   createTask,
   createDirectTask,
@@ -59,6 +59,7 @@ export {
   clearPendingAction,
   toggleHelpDialog,
   toggleSettingsDialog,
+  toggleAgentsDialog,
   sendActivePrompt,
   setSidebarFocusedProjectId,
 } from './focus';

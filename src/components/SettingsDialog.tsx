@@ -9,6 +9,7 @@ import {
   setThemePreset,
   setAutoTrustFolders,
   setInactiveColumnOpacity,
+  toggleAgentsDialog,
 } from '../store/store';
 import { mod } from '../lib/platform';
 import type { TerminalFont } from '../lib/fonts';
@@ -257,6 +258,43 @@ export function SettingsDialog(props: SettingsDialogProps) {
             This font includes ligatures which may impact rendering performance.
           </span>
         </Show>
+      </div>
+
+      <div style={{ display: 'flex', 'flex-direction': 'column', gap: '10px' }}>
+        <div
+          style={{
+            'font-size': '11px',
+            color: theme.fgMuted,
+            'text-transform': 'uppercase',
+            'letter-spacing': '0.05em',
+            'font-weight': '600',
+          }}
+        >
+          Agents
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            props.onClose();
+            toggleAgentsDialog(true);
+          }}
+          style={{
+            padding: '12px 16px',
+            background: theme.bgInput,
+            border: `1px solid ${theme.border}`,
+            'border-radius': '8px',
+            color: theme.fg,
+            cursor: 'pointer',
+            'font-size': '13px',
+            display: 'flex',
+            'align-items': 'center',
+            'justify-content': 'space-between',
+            width: '100%',
+          }}
+        >
+          <span>Manage Agents</span>
+          <span style={{ color: theme.fgMuted, 'font-size': '12px' }}>Configure AI agents →</span>
+        </button>
       </div>
     </Dialog>
   );

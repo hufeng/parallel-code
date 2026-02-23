@@ -1,4 +1,4 @@
-import { createSignal, createEffect, For, Show, onCleanup } from 'solid-js';
+import { createSignal, createEffect, createMemo, For, Show, onCleanup } from 'solid-js';
 import { Dialog } from './Dialog';
 import { invoke } from '../lib/ipc';
 import { IPC } from '../../electron/ipc/channels';
@@ -7,6 +7,7 @@ import {
   createTask,
   createDirectTask,
   toggleNewTaskDialog,
+  toggleAgentsDialog,
   loadAgents,
   getProjectPath,
   getProject,
@@ -21,6 +22,11 @@ import { cleanTaskName } from '../lib/clean-task-name';
 import { extractGitHubUrl } from '../lib/github-url';
 import { theme } from '../lib/theme';
 import type { AgentDef } from '../ipc/types';
+
+// Filter agents to only show enabled ones
+function getEnabledAgents(agents: AgentDef[]): AgentDef[] {
+  return agents.filter((a) => a.enabled !== false);
+}
 
 interface NewTaskDialogProps {
   open: boolean;
@@ -41,6 +47,10 @@ export function NewTaskDialog(props: NewTaskDialogProps) {
   const [directMode, setDirectMode] = createSignal(false);
   const [skipPermissions, setSkipPermissions] = createSignal(false);
   const [branchPrefix, setBranchPrefix] = createSignal('');
+
+  // Filter to only enabled agents
+  const enabledAgents = createMemo(() => getEnabledAgents(store.availableAgents));
+
   let projectMenuRef!: HTMLDivElement;
   let promptRef!: HTMLTextAreaElement;
   let formRef!: HTMLFormElement;
@@ -176,10 +186,11 @@ export function NewTaskDialog(props: NewTaskDialogProps) {
       if (store.availableAgents.length === 0) {
         await loadAgents();
       }
+      const enabledAgents = getEnabledAgents(store.availableAgents);
       const lastAgent = store.lastAgentId
-        ? (store.availableAgents.find((a) => a.id === store.lastAgentId) ?? null)
+        ? (enabledAgents.find((a) => a.id === store.lastAgentId) ?? null)
         : null;
-      setSelectedAgent(lastAgent ?? store.availableAgents[0] ?? null);
+      setSelectedAgent(lastAgent ?? enabledAgents[0] ?? null);
 
       // Pre-fill from drop data if present
       const dropUrl = store.newTaskDropUrl;
@@ -800,40 +811,71 @@ export function NewTaskDialog(props: NewTaskDialogProps) {
           >
             Agent
           </label>
-          <div style={{ display: 'flex', gap: '8px' }}>
-            <For each={store.availableAgents}>
-              {(agent) => {
-                const isSelected = () => selectedAgent()?.id === agent.id;
-                return (
-                  <button
-                    type="button"
-                    class={`agent-btn ${isSelected() ? 'selected' : ''}`}
-                    onClick={() => setSelectedAgent(agent)}
-                    style={{
-                      flex: '1',
-                      padding: '10px 8px',
-                      background: isSelected() ? theme.bgSelected : theme.bgInput,
-                      border: isSelected()
-                        ? `1px solid ${theme.accent}`
-                        : `1px solid ${theme.border}`,
-                      'border-radius': '8px',
-                      color: isSelected()
-                        ? store.themePreset === 'graphite' || store.themePreset === 'minimal'
-                          ? '#ffffff'
-                          : theme.accentText
-                        : theme.fg,
-                      cursor: 'pointer',
-                      'font-size': '12px',
-                      'font-weight': isSelected() ? '500' : '400',
-                      'text-align': 'center',
-                    }}
-                  >
-                    {agent.name}
-                  </button>
-                );
+          <Show when={enabledAgents().length > 0}>
+            <select
+              value={selectedAgent()?.id || ''}
+              onChange={(e) => {
+                const agent = enabledAgents().find((a) => a.id === e.currentTarget.value);
+                setSelectedAgent(agent || null);
               }}
-            </For>
-          </div>
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: theme.bgInput,
+                border: `1px solid ${theme.border}`,
+                'border-radius': '8px',
+                color: theme.fg,
+                'font-size': '13px',
+                outline: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              <For each={enabledAgents()}>
+                {(agent) => <option value={agent.id}>{agent.name}</option>}
+              </For>
+            </select>
+            <button
+              type="button"
+              onClick={() => {
+                toggleNewTaskDialog(false);
+                toggleAgentsDialog(true);
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: theme.fgMuted,
+                cursor: 'pointer',
+                'font-size': '11px',
+                'text-align': 'left',
+                padding: '4px 0',
+                'margin-top': '4px',
+              }}
+            >
+              + Manage Agents
+            </button>
+          </Show>
+          <Show when={enabledAgents().length === 0}>
+            <button
+              type="button"
+              onClick={() => {
+                toggleNewTaskDialog(false);
+                toggleAgentsDialog(true);
+              }}
+              style={{
+                width: '100%',
+                padding: '10px 12px',
+                background: theme.bgInput,
+                border: `1px dashed ${theme.border}`,
+                'border-radius': '8px',
+                color: theme.fgMuted,
+                cursor: 'pointer',
+                'font-size': '13px',
+                'text-align': 'center',
+              }}
+            >
+              + Add Agent
+            </button>
+          </Show>
         </div>
 
         {/* Direct mode toggle */}

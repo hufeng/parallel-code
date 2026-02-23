@@ -152,6 +152,7 @@ export interface AppStore {
   placeholderFocusedButton: 'add-task' | 'add-terminal';
   showHelpDialog: boolean;
   showSettingsDialog: boolean;
+  showAgentsDialog: boolean;
   pendingAction: PendingAction | null;
   notification: string | null;
   completedTaskDate: string;

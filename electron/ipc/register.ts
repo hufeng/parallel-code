@@ -27,7 +27,7 @@ import {
   rebaseTask,
 } from './git.js';
 import { createTask, deleteTask } from './tasks.js';
-import { listAgents } from './agents.js';
+import { listAgents, saveAgents } from './agents.js';
 import { saveAppState, loadAppState } from './persistence.js';
 import path from 'path';
 
@@ -70,6 +70,7 @@ export function registerAllHandlers(win: BrowserWindow): void {
 
   // --- Agent commands ---
   ipcMain.handle(IPC.ListAgents, () => listAgents());
+  ipcMain.handle(IPC.SaveAgents, (_e, args) => saveAgents(args.agents));
 
   // --- Task commands ---
   ipcMain.handle(IPC.CreateTask, (_e, args) => {

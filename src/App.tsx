@@ -10,6 +10,7 @@ import { TilingLayout } from './components/TilingLayout';
 import { NewTaskDialog } from './components/NewTaskDialog';
 import { HelpDialog } from './components/HelpDialog';
 import { SettingsDialog } from './components/SettingsDialog';
+import { AgentsDialog } from './components/AgentsDialog';
 import { WindowTitleBar } from './components/WindowTitleBar';
 import { WindowResizeHandles } from './components/WindowResizeHandles';
 import { theme } from './lib/theme';
@@ -32,6 +33,7 @@ import {
   setPendingAction,
   toggleHelpDialog,
   toggleSettingsDialog,
+  toggleAgentsDialog,
   sendActivePrompt,
   spawnShellForTask,
   closeShell,
@@ -669,6 +671,7 @@ function App() {
           open={store.showSettingsDialog}
           onClose={() => toggleSettingsDialog(false)}
         />
+        <AgentsDialog open={store.showAgentsDialog} onClose={() => toggleAgentsDialog(false)} />
         <Show when={showDropOverlay()}>
           <DropOverlay />
         </Show>

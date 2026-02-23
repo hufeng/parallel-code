@@ -28,6 +28,7 @@ export const [store, setStore] = createStore<AppStore>({
   placeholderFocusedButton: 'add-task',
   showHelpDialog: false,
   showSettingsDialog: false,
+  showAgentsDialog: false,
   pendingAction: null,
   notification: null,
   completedTaskDate: getLocalDateKey(),
